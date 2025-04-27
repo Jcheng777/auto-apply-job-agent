@@ -1,0 +1,17 @@
+{
+    "address": "123 Main St, Anytown, USA",
+    "current_company": "",
+    "current_position": "",
+    "education": [],
+    "email": "john.doe@example.com",
+    "github": "https://github.com/johndoe",
+    "linkedin": "https://linkedin.com/in/johndoe",
+    "name": "John Doe",
+    "phone": "(555) 123-4567",
+    "portfolio": "",
+    "resume_path": "/Users/jessecheng/auto-apply-job-agent/agent/sample_resume.pdf",
+    "skills": [],
+    "summary": "Experienced software developer with a passion for automation.",
+    "website": "https://johndoe.com",
+    "years_experience": 0
+}

@@ -5,6 +5,7 @@ Form autofiller for job applications using Playwright.
 from playwright.sync_api import sync_playwright
 from simple_form_extractor import extract_important_fields
 from user_profile import UserProfile
+from select_field_handler import SelectFieldHandler
 import time
 import os
 
@@ -20,6 +21,7 @@ class FormAutofiller:
         self.playwright = None
         self.browser = None
         self.page = None
+        self.select_handler = SelectFieldHandler()
         
     def start_browser(self, headless=False):
         """Start the browser if it's not already running."""
@@ -120,17 +122,54 @@ class FormAutofiller:
                         if element:
                             # Check if it's a select element
                             if field_type == "select-one":
-                                # Try to select an option by text
-                                element.select_option(label=value)
+                                # Get all options
+                                options = self.select_handler.get_select_options(element)
+                                
+                                # Determine field type for better matching
+                                field_type = self.select_handler.determine_field_type(
+                                    field_label or "",
+                                    field_name or "",
+                                    field.get("placeholder", "")
+                                )
+                                
+                                # Get the best match
+                                matched_value = self.select_handler.match_select_option(
+                                    options,
+                                    value,
+                                    field_type
+                                )
+                                
+                                if matched_value:
+                                    try:
+                                        # Try to select by label first
+                                        element.select_option(label=matched_value)
+                                        filled_fields.append({
+                                            "field": field_label or field_name or field_id,
+                                            "value": matched_value,
+                                            "status": "filled"
+                                        })
+                                    except:
+                                        # Fallback to value if label selection fails
+                                        element.select_option(value=matched_value)
+                                        filled_fields.append({
+                                            "field": field_label or field_name or field_id,
+                                            "value": matched_value,
+                                            "status": "filled (by value)"
+                                        })
+                                else:
+                                    filled_fields.append({
+                                        "field": field_label or field_name or field_id,
+                                        "value": value,
+                                        "status": "failed - no matching option"
+                                    })
                             else:
                                 # Fill text input or textarea
                                 element.fill(value)
-                            
-                            filled_fields.append({
-                                "field": field_label or field_name or field_id,
-                                "value": value,
-                                "status": "filled"
-                            })
+                                filled_fields.append({
+                                    "field": field_label or field_name or field_id,
+                                    "value": value,
+                                    "status": "filled"
+                                })
             
             # Take a screenshot for verification
             screenshot_path = "form_filled.png"

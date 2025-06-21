@@ -5,13 +5,36 @@ IMPORTANT_KEYWORDS = [
     "name", "email", "phone", "linkedin", "address", "resume", "cv",
     # Work Authorization
     "authorized", "authorization", "work permit", "visa", "sponsorship",
-    "citizenship", "citizen", "permanent resident", "green card",
+    "citizenship", "citizen", "permanent resident", "green card", "countries", "states"
     # Common Questions
     "experience", "years", "salary", "expected salary", "desired salary",
     "notice period", "available", "start date", "relocation", "remote",
     "hybrid", "onsite", "work location", "job location",
     # File Uploads
-    "upload", "attach", "file", "document", "pdf", "doc", "docx"
+    "upload", "attach", "file", "document", "pdf", "doc", "docx",
+    # Extra Fields
+    "github", "twitter", "X", "github", "website", "linkedin",
+    # Acknowledgement
+    "acknowledge", "accept", "confirm", "agree", "acceptance", "acknowledgment",
+    "acknowledgement", "acceptance", "confirmation", "acceptance", "acknowledgment",
+    "acknowledgement", "acceptance", "confirmation", "acceptance", "acknowledgment", "accuracy"
+
+    #U.S. Standard Demographic Questions
+    # gender
+    "gender", "identity", "describe", "transgender", "sexual", "sexual orientation"
+
+    # race
+    "racial", "race", "ethnic",
+
+    # disability
+    "disability", "crhonic", "chronic condition"
+
+    # veteran status
+    "veteran", "veteran status", "active member"
+
+    # Commute
+    "commute", "commuting", "located"
+
 ]
 
 def extract_important_fields(url):
@@ -31,7 +54,7 @@ def extract_important_fields(url):
             id_attr = element.get_attribute("id")
             name_attr = element.get_attribute("name")
             placeholder = element.get_attribute("placeholder") or ""
-
+            class_attr = element.get_attribute("class") or ""
             # Try to find label (either linked by "for" attribute or closest label)
             label = ""
             try:
@@ -63,8 +86,9 @@ def extract_important_fields(url):
                 "name": name_attr,
                 "placeholder": placeholder,
                 "value": value,
+                "class": class_attr,
                 "is_required": element.get_attribute("required") is not None,
-                "field_type": determine_field_type(label, name_attr, placeholder, element_type)
+                "field_type": determine_field_type(label, name_attr, placeholder, element_type, class_attr)
             }
 
             # Check if label, name, or placeholder matches important fields
@@ -76,9 +100,17 @@ def extract_important_fields(url):
 
     return important_fields
 
-def determine_field_type(label, name, placeholder, element_type):
+def determine_field_type(label, name, placeholder, element_type, class_attr):
     """Determine the semantic type of the field based on its attributes."""
-    combined_text = f"{label} {name} {placeholder}".lower()
+    combined_text = f"{label} {name} {placeholder} {class_attr}".lower()
+    
+    # Check for select__input class pattern
+    if "select__input" in combined_text:
+        return "select-one"
+    
+    # Select fields
+    if element_type == "select-one":
+        return "select-one"  # Generic select field
     
     # File upload fields
     if element_type == "file" or "upload" in combined_text or "attach" in combined_text:

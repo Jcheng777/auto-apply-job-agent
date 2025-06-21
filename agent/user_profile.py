@@ -30,11 +30,11 @@ class UserProfile:
         # Work Authorization
         self.work_authorized = True  # Default to True, update as needed
         self.requires_sponsorship = False  # Default to False, update as needed
-        self.citizenship = ""  # e.g., "US Citizen", "Permanent Resident"
+        self.citizenship = "US Citizen"  # e.g., "US Citizen", "Permanent Resident"
         self.visa_status = ""  # e.g., "H1B", "Green Card"
         
         # Job Preferences
-        self.desired_salary = ""
+        self.desired_salary = "100000"
         self.notice_period = "2 weeks"  # Default notice period
         self.available_start_date = ""  # Leave empty for immediate
         self.willing_to_relocate = True

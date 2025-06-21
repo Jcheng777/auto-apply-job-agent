@@ -3,10 +3,13 @@ Main script for the job application autofiller.
 """
 
 import os
-import json
+from dotenv import load_dotenv
 from simple_form_extractor import extract_important_fields
 from user_profile import UserProfile
 from form_autofiller import FormAutofiller
+
+# Load environment variables from .env file
+load_dotenv()
 
 def create_sample_profile():
     """Create a sample user profile for testing."""
@@ -93,7 +96,7 @@ def main():
             
             print("\n--- Important Fields Found ---")
             for field in important_fields:
-                print(f"Label: {field['label']} | ID: {field['id']} | Name: {field['name']} | Type: {field['type']}")
+                print(f"Label: {field['label']} | ID: {field['id']} | Name: {field['name']} | Type: {field['type']} | Class: {field['class']}")
                 
         elif choice == "2":
             # Fill form fields without submitting
